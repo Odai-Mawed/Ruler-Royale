@@ -1,31 +1,21 @@
-import { Platform } from 'react-native';
-
+// Schlichtes, helles Design: eine Akzentfarbe, flache Flächen, Systemschrift.
 export const C = {
-  bg: '#0b0a10',
-  bg2: '#12101a',
-  surface: '#17151f',
-  surface2: '#221f2d',
-  line: '#2e2a3b',
-  gold: '#e8c26a',
-  goldDeep: '#a8842f',
-  text: '#f3eee2',
-  muted: '#a49e8f',
-  dim: '#6e6879',
-  red: '#e2574c',
-  blue: '#4c8fe2',
-  green: '#4cc38a',
+  bg: '#ffffff',
+  bg2: '#ffffff',
+  surface: '#ffffff',
+  surface2: '#f2f2f4',
+  line: '#e7e7eb',
+  gold: '#111111', // Akzentfarbe (historischer Name)
+  goldDeep: '#111111',
+  onAccent: '#ffffff',
+  text: '#111111',
+  muted: '#6b6b76',
+  dim: '#a3a3ad',
+  red: '#d9443a',
+  blue: '#2f6fdb',
+  green: '#1f9d61',
 };
 
 export const SIDE = [C.red, C.blue] as const;
 
-export const F = {
-  display: 'Cinzel_900Black',
-  title: 'Cinzel_700Bold',
-};
-
-export const shadow = Platform.select({
-  web: { boxShadow: '0 6px 24px rgba(0,0,0,0.45)' } as object,
-  default: { shadowColor: '#000', shadowOpacity: 0.4, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 6 },
-});
-
-export const MAX_W = 960;
+export const MAX_W = 760;

@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View, type ScrollViewInstance, type StyleProp, type ViewStyle } from 'react-native';
 import { useNav } from '../nav';
-import { C, F, MAX_W } from '../theme';
+import { C, MAX_W } from '../theme';
 
 export const Screen = ({
   children,
@@ -32,8 +32,8 @@ export const OverlayHeader = ({ title, right }: { title?: string; right?: React.
     <View style={styles.header}>
       <View style={styles.headerInner}>
         <Pressable onPress={nav.close} hitSlop={12} style={styles.back} accessibilityLabel="Zurück">
-          <Text style={{ color: C.gold, fontSize: 22 }}>‹</Text>
-          <Text style={{ color: C.gold, fontFamily: F.title, fontSize: 14 }}>Zurück</Text>
+          <Text style={{ color: C.text, fontSize: 22 }}>‹</Text>
+          <Text style={{ color: C.text, fontWeight: '500', fontSize: 14 }}>Zurück</Text>
         </Pressable>
         {title ? (
           <Text style={styles.title} numberOfLines={1}>
@@ -62,5 +62,5 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   back: { flexDirection: 'row', alignItems: 'center', gap: 4, minWidth: 70 },
-  title: { flex: 1, textAlign: 'center', color: C.text, fontFamily: F.title, fontSize: 16 },
+  title: { flex: 1, textAlign: 'center', color: C.text, fontWeight: '600', fontSize: 16 },
 });

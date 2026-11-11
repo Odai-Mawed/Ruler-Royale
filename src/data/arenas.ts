@@ -193,14 +193,6 @@ export const eraOf = (year: number): Era => {
 
 export const ERAS: Era[] = ['Antike', 'Mittelalter', 'Frühe Neuzeit', 'Moderne', 'Gegenwart'];
 
-export const ERA_COLORS: Record<Era, [string, string]> = {
-  Antike: ['#c9a227', '#6b4e16'],
-  Mittelalter: ['#b23a48', '#4a1520'],
-  'Frühe Neuzeit': ['#3a7bd5', '#142d57'],
-  Moderne: ['#2a9d8f', '#0f3b36'],
-  Gegenwart: ['#8e5bd6', '#2e1a4d'],
-};
-
 export const power = (f: Figure): number => {
   const v = Object.values(f.stats);
   return Math.round(v.reduce((a, b) => a + b, 0) / v.length);

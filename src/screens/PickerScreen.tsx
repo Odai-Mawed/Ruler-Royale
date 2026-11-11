@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { ERAS, eraOf, power } from '../data/arenas';
 import { FIGURES } from '../data/figures';
-import { C, F, MAX_W } from '../theme';
+import { C, MAX_W } from '../theme';
 import type { Era } from '../types';
 import { Avatar, Chip } from '../ui';
 import { OverlayHeader } from './common';
@@ -68,7 +68,7 @@ export default function PickerScreen({
               onPick(pool[Math.floor(Math.random() * pool.length)].id);
             }}
           >
-            <Text style={{ color: C.gold, fontFamily: F.title }}>🎲 Zufall</Text>
+            <Text style={{ color: C.gold, fontWeight: '600' }}>Zufall</Text>
           </Pressable>
         }
       />
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 12,
   },
-  name: { color: C.text, fontFamily: F.title, fontSize: 15 },
+  name: { color: C.text, fontWeight: '600', fontSize: 15 },
   meta: { color: C.muted, fontSize: 12, marginTop: 2 },
-  power: { color: C.gold, fontWeight: '700', fontSize: 13 },
+  power: { color: C.muted, fontWeight: '500', fontSize: 13 },
 });

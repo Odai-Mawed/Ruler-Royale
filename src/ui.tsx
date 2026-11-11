@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
 import {
   Animated,
@@ -11,33 +10,25 @@ import {
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
-import { ERA_COLORS, eraOf } from './data/arenas';
-import { C, F } from './theme';
+import { C } from './theme';
 import type { Figure } from './types';
 
-export const Avatar = ({ fig, size = 56, ring }: { fig: Figure; size?: number; ring?: string }) => {
-  const [c1, c2] = ERA_COLORS[eraOf(fig.year)];
-  return (
-    <View
-      style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        padding: ring ? 3 : 0,
-        backgroundColor: ring ?? 'transparent',
-      }}
-    >
-      <LinearGradient
-        colors={[c1, c2]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{ flex: 1, borderRadius: size / 2, alignItems: 'center', justifyContent: 'center' }}
-      >
-        <Text style={{ fontSize: size * 0.46 }}>{fig.emoji}</Text>
-      </LinearGradient>
-    </View>
-  );
-};
+export const Avatar = ({ fig, size = 56, ring }: { fig: Figure; size?: number; ring?: string }) => (
+  <View
+    style={{
+      width: size,
+      height: size,
+      borderRadius: size / 2,
+      backgroundColor: C.surface2,
+      borderWidth: ring ? 2 : 0,
+      borderColor: ring,
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <Text style={{ fontSize: size * 0.44 }}>{fig.emoji}</Text>
+  </View>
+);
 
 export const H1 = ({ children, style }: { children: React.ReactNode; style?: StyleProp<TextStyle> }) => (
   <Text style={[styles.h1, style]}>{children}</Text>
@@ -73,7 +64,7 @@ export const Btn = ({
       styles.btn,
       small && styles.btnSmall,
       variant === 'gold' && { backgroundColor: C.gold },
-      variant === 'ghost' && { borderWidth: 1, borderColor: C.gold },
+      variant === 'ghost' && { borderWidth: 1, borderColor: C.line },
       variant === 'dark' && { backgroundColor: C.surface2 },
       (pressed || disabled) && { opacity: 0.7, transform: [{ scale: 0.98 }] },
       style,
@@ -83,7 +74,7 @@ export const Btn = ({
       style={[
         styles.btnText,
         small && { fontSize: 13 },
-        { color: variant === 'gold' ? '#1a1406' : variant === 'ghost' ? C.gold : C.text },
+        { color: variant === 'gold' ? C.onAccent : C.text },
       ]}
     >
       {label}
@@ -93,7 +84,7 @@ export const Btn = ({
 
 export const Chip = ({ label, active, onPress }: { label: string; active?: boolean; onPress: () => void }) => (
   <Pressable onPress={onPress} style={[styles.chip, active && styles.chipActive]}>
-    <Text style={[styles.chipText, active && { color: '#1a1406' }]}>{label}</Text>
+    <Text style={[styles.chipText, active && { color: C.onAccent }]}>{label}</Text>
   </Pressable>
 );
 
@@ -168,27 +159,6 @@ export const FadeIn = ({
   );
 };
 
-export const Pulse = ({ children, style }: { children: React.ReactNode; style?: StyleProp<ViewStyle> }) => {
-  const anim = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(anim, { toValue: 1, duration: 900, useNativeDriver: Platform.OS !== 'web' }),
-        Animated.timing(anim, { toValue: 0, duration: 900, useNativeDriver: Platform.OS !== 'web' }),
-      ]),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [anim]);
-  return (
-    <Animated.View
-      style={[style, { transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [1, 1.08] }) }] }]}
-    >
-      {children}
-    </Animated.View>
-  );
-};
-
 export const Section = ({ title, children, right }: { title: string; children: React.ReactNode; right?: React.ReactNode }) => (
   <View style={{ marginTop: 24 }}>
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
@@ -200,18 +170,18 @@ export const Section = ({ title, children, right }: { title: string; children: R
 );
 
 const styles = StyleSheet.create({
-  h1: { fontFamily: F.display, color: C.gold, fontSize: 28, letterSpacing: 1 },
-  h2: { fontFamily: F.title, color: C.text, fontSize: 18, letterSpacing: 0.5 },
+  h1: { fontWeight: '700', color: C.text, fontSize: 28, letterSpacing: -0.5 },
+  h2: { fontWeight: '600', color: C.text, fontSize: 17 },
   p: { color: C.muted, fontSize: 15, lineHeight: 22 },
   btn: {
-    paddingVertical: 14,
-    paddingHorizontal: 22,
-    borderRadius: 14,
+    paddingVertical: 13,
+    paddingHorizontal: 20,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   btnSmall: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 10 },
-  btnText: { fontFamily: F.title, fontSize: 16, letterSpacing: 0.5 },
+  btnText: { fontWeight: '600', fontSize: 15 },
   chip: {
     paddingVertical: 7,
     paddingHorizontal: 13,
@@ -219,14 +189,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: C.line,
     backgroundColor: C.surface,
-    marginRight: 8,
+    marginRight: 6,
     marginBottom: 8,
   },
   chipActive: { backgroundColor: C.gold, borderColor: C.gold },
-  chipText: { color: C.text, fontSize: 13, fontWeight: '600' },
+  chipText: { color: C.text, fontSize: 13, fontWeight: '500' },
   card: {
     backgroundColor: C.surface,
-    borderRadius: 18,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: C.line,
     padding: 16,

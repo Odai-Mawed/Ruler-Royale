@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Platform, Pressable, Share, StyleSheet, Text, View } from 'react-native';
 import { ARENAS, STAT_ICONS, STAT_KEYS, STAT_LABELS, eraOf } from '../data/arenas';
@@ -7,9 +6,9 @@ import { MAX_HP, homeArenas, simulateBattle, type RoundResult } from '../engine/
 import { randomSeed } from '../engine/rng';
 import { useNav, type BattleRequest } from '../nav';
 import { recordBattle } from '../storage';
-import { C, F, SIDE, shadow } from '../theme';
+import { C, SIDE } from '../theme';
 import type { Figure } from '../types';
-import { Avatar, Bar, Btn, Card, FadeIn, P, Pulse } from '../ui';
+import { Avatar, Bar, Btn, Card, FadeIn, P } from '../ui';
 import { gapText } from './ArenaScreen';
 import { OverlayHeader, Screen } from './common';
 
@@ -18,7 +17,7 @@ type Phase = 'intro' | 'fight' | 'result';
 const REVEAL_MS = 2600;
 
 const shareBattle = async (a: Figure, b: Figure, seed: string, winner: Figure) => {
-  const text = `👑 ${winner.name} gewinnt bei Ruler Royale: ${a.name} vs. ${b.name}! Schaffst du's anders?`;
+  const text = `${winner.name} gewinnt bei Ruler Royale: ${a.name} vs. ${b.name}! Schaffst du's anders?`;
   if (Platform.OS === 'web' && typeof window !== 'undefined') {
     const url = `${window.location.origin}${window.location.pathname}?a=${a.id}&b=${b.id}&s=${seed}`;
     const nav = window.navigator as Navigator & { share?: (d: ShareData) => Promise<void> };
@@ -105,7 +104,7 @@ export default function BattleScreen({ req }: { req: BattleRequest }) {
         right={
           phase === 'fight' ? (
             <Pressable onPress={() => setRevealed(result.rounds.length)} hitSlop={10}>
-              <Text style={{ color: C.gold, fontFamily: F.title, fontSize: 13 }}>⏩ Alles</Text>
+              <Text style={{ color: C.gold, fontWeight: '600', fontSize: 13 }}>Überspringen</Text>
             </Pressable>
           ) : undefined
         }
@@ -122,15 +121,13 @@ export default function BattleScreen({ req }: { req: BattleRequest }) {
               </FadeIn>
             ))}
             {phase === 'fight' && revealed < result.rounds.length && (
-              <Pulse style={{ alignSelf: 'center', marginTop: 16 }}>
-                <Text style={{ color: C.gold, fontFamily: F.title }}>⚔️ Runde {revealed + 1} läuft …</Text>
-              </Pulse>
+              <Text style={{ color: C.muted, textAlign: 'center', marginTop: 16 }}>Runde {revealed + 1} läuft …</Text>
             )}
             {phase === 'result' && (
               <FadeIn>
-                <LinearGradient colors={['#3a2a08', '#17131f']} style={[styles.winner, shadow]}>
-                  <Text style={{ fontSize: 46 }}>👑</Text>
-                  <Avatar fig={winner} size={110} ring={C.gold} />
+                <View style={styles.winner}>
+                  <Text style={styles.winnerLabel}>Sieger</Text>
+                  <Avatar fig={winner} size={88} />
                   <Text style={styles.winnerName}>{winner.name}</Text>
                   <Text style={styles.verdict}>{result.verdict}</Text>
                   <Text style={styles.hpFinal}>
@@ -143,25 +140,25 @@ export default function BattleScreen({ req }: { req: BattleRequest }) {
                   {prediction && (
                     <Text style={[styles.pred, { color: prediction === winner.id ? C.green : C.red }]}>
                       {prediction === winner.id
-                        ? '🎯 Dein Tipp war richtig! Die Serie wächst.'
-                        : `❌ Daneben – du hattest auf ${FIGURE_MAP[prediction].name} gesetzt.`}
+                        ? 'Dein Tipp war richtig.'
+                        : `Daneben – du hattest auf ${FIGURE_MAP[prediction].name} gesetzt.`}
                     </Text>
                   )}
                   <View style={styles.epilog}>
-                    <Text style={styles.epilogLabel}>📖 Alternative Geschichte</Text>
+                    <Text style={styles.epilogLabel}>Alternative Geschichte</Text>
                     <Text style={styles.epilogText}>{result.epilog}</Text>
                   </View>
                   <Text style={{ color: C.dim, fontSize: 12, marginTop: 10 }}>
                     {loser.name} kann sich trösten: „{loser.fact}“
                   </Text>
-                </LinearGradient>
+                </View>
                 <View style={styles.resultBtns}>
-                  <Btn label="🔁 Revanche" onPress={rematch} style={{ flex: 1 }} />
-                  <Btn label="📤 Teilen" onPress={share} variant="ghost" style={{ flex: 1 }} />
+                  <Btn label="Revanche" onPress={rematch} style={{ flex: 1 }} />
+                  <Btn label="Teilen" onPress={share} variant="ghost" style={{ flex: 1 }} />
                 </View>
                 <View style={[styles.resultBtns, { marginTop: 10 }]}>
-                  <Btn label={`📚 ${a.name.split(' ')[0]}`} onPress={() => nav.openDetail(a.id)} variant="dark" small style={{ flex: 1 }} />
-                  <Btn label={`📚 ${b.name.split(' ')[0]}`} onPress={() => nav.openDetail(b.id)} variant="dark" small style={{ flex: 1 }} />
+                  <Btn label={a.name} onPress={() => nav.openDetail(a.id)} variant="dark" small style={{ flex: 1 }} />
+                  <Btn label={b.name} onPress={() => nav.openDetail(b.id)} variant="dark" small style={{ flex: 1 }} />
                 </View>
                 <Btn label="Neue Gegner wählen" onPress={nav.close} variant="dark" style={{ marginTop: 10 }} />
                 <P style={{ textAlign: 'center', fontSize: 11, marginTop: 14 }}>Kampf-Code: {seed}</P>
@@ -172,7 +169,7 @@ export default function BattleScreen({ req }: { req: BattleRequest }) {
       </Screen>
       {toast && (
         <View style={styles.toast} pointerEvents="none">
-          <Text style={{ color: '#1a1406', fontWeight: '700' }}>{toast}</Text>
+          <Text style={{ color: C.onAccent, fontWeight: '700' }}>{toast}</Text>
         </View>
       )}
     </View>
@@ -215,9 +212,7 @@ const Intro = ({
           <Text style={styles.introMeta}>{a.title}</Text>
           <Text style={styles.introMeta}>{a.lived}</Text>
         </Animated.View>
-        <Pulse>
-          <Text style={styles.bigVs}>VS</Text>
-        </Pulse>
+        <Text style={styles.bigVs}>vs</Text>
         <Animated.View style={[styles.introSide, { transform: [{ translateX: slideB }] }]}>
           <Avatar fig={b} size={96} ring={SIDE[1]} />
           <Text style={styles.introName}>{b.name}</Text>
@@ -226,7 +221,7 @@ const Intro = ({
         </Animated.View>
       </View>
       <Text style={styles.gap}>
-        ⏳ {gapText(a.year, b.year)} · {eraOf(a.year)} vs. {eraOf(b.year)}
+        {gapText(a.year, b.year)} · {eraOf(a.year)} vs. {eraOf(b.year)}
       </Text>
 
       <View style={styles.tauntRow}>
@@ -240,7 +235,7 @@ const Intro = ({
       <Text style={{ color: C.dim, fontSize: 11, textAlign: 'center', marginTop: 4 }}>Kampfansagen sind frei erfunden.</Text>
 
       <Card style={{ marginTop: 18 }}>
-        <Text style={styles.tapeTitle}>📏 Tale of the Tape</Text>
+        <Text style={styles.tapeTitle}>Werte im Vergleich</Text>
         {STAT_KEYS.map((k, i) => {
           const va = a.stats[k];
           const vb = b.stats[k];
@@ -261,14 +256,14 @@ const Intro = ({
       <View style={styles.abilityRow}>
         {[a, b].map((f, k) => (
           <Card key={f.id} style={{ flex: 1, borderColor: SIDE[k] }}>
-            <Text style={styles.abLabel}>🎯 Heimarena</Text>
+            <Text style={styles.abLabel}>Heimarena</Text>
             <Text style={styles.abName}>
-              {(k === 0 ? homeA : homeB).emoji} {(k === 0 ? homeA : homeB).name}
+              {(k === 0 ? homeA : homeB).name}
             </Text>
-            <Text style={[styles.abLabel, { marginTop: 10 }]}>⚡ Spezialfähigkeit</Text>
+            <Text style={[styles.abLabel, { marginTop: 10 }]}>Stärke</Text>
             <Text style={styles.abName}>{f.ability.name}</Text>
             <Text style={styles.abDesc}>{f.ability.desc}</Text>
-            <Text style={[styles.abLabel, { marginTop: 10 }]}>💔 Achillesferse</Text>
+            <Text style={[styles.abLabel, { marginTop: 10 }]}>Schwäche</Text>
             <Text style={styles.abName}>{f.weakness.name}</Text>
             <Text style={styles.abDesc}>{f.weakness.desc}</Text>
           </Card>
@@ -277,7 +272,7 @@ const Intro = ({
 
       {predict ? (
         <Card style={{ marginTop: 18, alignItems: 'center' }}>
-          <Text style={styles.tapeTitle}>🔮 Wer gewinnt? Dein Tipp:</Text>
+          <Text style={styles.tapeTitle}>Wer gewinnt? Dein Tipp:</Text>
           <View style={{ flexDirection: 'row', gap: 10, marginTop: 10, width: '100%' }}>
             <Btn label={a.name} onPress={() => onStart(a.id)} style={{ flex: 1, backgroundColor: SIDE[0] }} small />
             <Btn label={b.name} onPress={() => onStart(b.id)} style={{ flex: 1, backgroundColor: SIDE[1] }} small />
@@ -287,7 +282,7 @@ const Intro = ({
           </Pressable>
         </Card>
       ) : (
-        <Btn label="⚔️ Kampf starten" onPress={() => onStart()} style={{ marginTop: 18 }} />
+        <Btn label="Kampf starten" onPress={() => onStart()} style={{ marginTop: 18 }} />
       )}
     </View>
   );
@@ -328,7 +323,7 @@ const HpHeader = ({ a, b, hp }: { a: Figure; b: Figure; hp: [number, number] }) 
           <Text style={styles.hpNum}>{hp[0]} MP</Text>
         </View>
       </View>
-      <Text style={{ color: C.gold, fontFamily: F.display, marginHorizontal: 8 }}>VS</Text>
+      <Text style={{ color: C.muted, fontWeight: '600', marginHorizontal: 8 }}>vs</Text>
       <View style={[styles.hpSide, { flexDirection: 'row-reverse' }]}>
         <Avatar fig={b} size={40} ring={SIDE[1]} />
         <View style={{ flex: 1, marginRight: 8 }}>
@@ -350,7 +345,7 @@ const RoundCard = ({ r, a, b, total }: { r: RoundResult; a: Figure; b: Figure; t
   const fighters = [a, b];
   const isFinal = r.arena === 'finale';
   return (
-    <Card style={[styles.round, isFinal && { borderColor: C.gold }]}>
+    <Card style={[styles.round, isFinal && { borderColor: C.text }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text style={styles.roundNo}>
           RUNDE {r.index + 1}/{total}
@@ -362,7 +357,7 @@ const RoundCard = ({ r, a, b, total }: { r: RoundResult; a: Figure; b: Figure; t
         )}
       </View>
       <Text style={styles.arenaName}>
-        {arena.emoji} {arena.name}
+        {arena.name}
       </Text>
       <Text style={styles.arenaIntro}>{arena.intro}</Text>
 
@@ -371,7 +366,7 @@ const RoundCard = ({ r, a, b, total }: { r: RoundResult; a: Figure; b: Figure; t
           <View key={k} style={[styles.scoreBox, { borderColor: r.winner === k ? SIDE[k as 0 | 1] : C.line }]}>
             <Text style={[styles.scoreTotal, { color: SIDE[k as 0 | 1] }]}>{s.total}</Text>
             <Text style={styles.scoreDetail}>
-              Basis {s.base} · 🎲 {s.roll >= 0 ? '+' : ''}
+              Basis {s.base} · Würfel {s.roll >= 0 ? '+' : ''}
               {s.roll}
             </Text>
             {s.mods
@@ -393,7 +388,7 @@ const RoundCard = ({ r, a, b, total }: { r: RoundResult; a: Figure; b: Figure; t
       ))}
       {r.winner !== -1 && (
         <Text style={styles.damage}>
-          💥 −{r.damage} Machtpunkte für {fighters[1 - r.winner].name}
+          −{r.damage} Machtpunkte für {fighters[1 - r.winner].name}
           {isFinal ? ' (Finale ×1,5)' : ''}
         </Text>
       )}
@@ -404,20 +399,20 @@ const RoundCard = ({ r, a, b, total }: { r: RoundResult; a: Figure; b: Figure; t
 const styles = StyleSheet.create({
   introRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   introSide: { flex: 1, alignItems: 'center' },
-  introName: { color: C.text, fontFamily: F.title, fontSize: 16, textAlign: 'center', marginTop: 10 },
+  introName: { color: C.text, fontWeight: '600', fontSize: 16, textAlign: 'center', marginTop: 10 },
   introMeta: { color: C.muted, fontSize: 12, textAlign: 'center', marginTop: 2 },
-  bigVs: { fontFamily: F.display, fontSize: 38, color: C.gold, marginHorizontal: 6 },
+  bigVs: { fontWeight: '600', fontSize: 18, color: C.muted, marginHorizontal: 6 },
   gap: { color: C.muted, textAlign: 'center', marginTop: 14, fontSize: 13 },
   tauntRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
   bubble: { flex: 1, backgroundColor: C.surface, borderWidth: 1, borderRadius: 14, padding: 12 },
   bubbleText: { color: C.text, fontStyle: 'italic', fontSize: 13, lineHeight: 19 },
-  tapeTitle: { color: C.gold, fontFamily: F.title, fontSize: 15, marginBottom: 6, textAlign: 'center' },
+  tapeTitle: { color: C.text, fontWeight: '600', fontSize: 15, marginBottom: 6, textAlign: 'center' },
   tapeRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10, gap: 6 },
   tapeVal: { width: 28, textAlign: 'center', color: C.muted, fontWeight: '700', fontSize: 13 },
   tapeLabel: { width: 104, textAlign: 'center', color: C.text, fontSize: 12 },
   abilityRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
   abLabel: { color: C.muted, fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5 },
-  abName: { color: C.text, fontFamily: F.title, fontSize: 13, marginTop: 2 },
+  abName: { color: C.text, fontWeight: '600', fontSize: 13, marginTop: 2 },
   abDesc: { color: C.muted, fontSize: 12, marginTop: 2 },
   hpHeader: { backgroundColor: C.bg2, borderBottomWidth: 1, borderBottomColor: C.line },
   hpInner: {
@@ -429,31 +424,32 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   hpSide: { flex: 1, flexDirection: 'row', alignItems: 'center' },
-  hpName: { color: C.text, fontSize: 12, fontFamily: F.title, marginBottom: 4 },
+  hpName: { color: C.text, fontSize: 12, fontWeight: '600', marginBottom: 4 },
   hpTrack: { height: 12, backgroundColor: C.surface2, borderRadius: 99, overflow: 'hidden' },
   hpNum: { color: C.muted, fontSize: 11, marginTop: 3 },
   round: { marginBottom: 12 },
   roundNo: { color: C.dim, fontSize: 11, letterSpacing: 1.5, fontWeight: '700' },
   roundWin: { fontSize: 12, fontWeight: '700' },
-  arenaName: { color: C.gold, fontFamily: F.title, fontSize: 19, marginTop: 4 },
+  arenaName: { color: C.text, fontWeight: '600', fontSize: 18, marginTop: 4 },
   arenaIntro: { color: C.muted, fontSize: 13, marginTop: 2 },
   scoreRow: { flexDirection: 'row', gap: 10, marginTop: 12 },
   scoreBox: { flex: 1, borderWidth: 1, borderRadius: 12, padding: 10, alignItems: 'center', backgroundColor: C.bg2 },
-  scoreTotal: { fontFamily: F.display, fontSize: 28 },
+  scoreTotal: { fontWeight: '700', fontSize: 26 },
   scoreDetail: { color: C.muted, fontSize: 11, marginTop: 2 },
   line: { color: C.muted, fontSize: 13, marginTop: 8, lineHeight: 19 },
-  lineMain: { color: C.text, fontSize: 15, fontWeight: '600' },
+  lineMain: { color: C.text, fontSize: 15, fontWeight: '500' },
   damage: { color: C.red, fontSize: 13, marginTop: 8, fontWeight: '700' },
-  winner: { borderRadius: 22, padding: 22, alignItems: 'center', borderWidth: 1, borderColor: C.goldDeep, marginTop: 8 },
-  winnerName: { fontFamily: F.display, color: C.gold, fontSize: 26, textAlign: 'center', marginTop: 12 },
-  verdict: { color: C.text, fontFamily: F.title, fontSize: 16, marginTop: 4 },
+  winner: { borderRadius: 12, padding: 20, alignItems: 'center', borderWidth: 1, borderColor: C.line, marginTop: 8 },
+  winnerLabel: { color: C.muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 },
+  winnerName: { fontWeight: '700', color: C.text, fontSize: 24, textAlign: 'center', marginTop: 12 },
+  verdict: { color: C.text, fontWeight: '600', fontSize: 16, marginTop: 4 },
   hpFinal: { color: C.muted, fontSize: 13, marginTop: 4 },
-  speech: { marginTop: 16, backgroundColor: 'rgba(0,0,0,0.3)', borderRadius: 14, padding: 14, width: '100%' },
-  speechLabel: { color: C.gold, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase' },
+  speech: { marginTop: 16, backgroundColor: C.surface2, borderRadius: 14, padding: 14, width: '100%' },
+  speechLabel: { color: C.muted, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase' },
   speechText: { color: C.text, fontSize: 15, fontStyle: 'italic', marginTop: 4, lineHeight: 22 },
   pred: { marginTop: 14, fontWeight: '700', textAlign: 'center' },
   epilog: { marginTop: 14, width: '100%' },
-  epilogLabel: { color: C.gold, fontSize: 12, fontWeight: '700' },
+  epilogLabel: { color: C.muted, fontSize: 12, fontWeight: '700' },
   epilogText: { color: C.text, fontSize: 14, marginTop: 4, lineHeight: 20 },
   resultBtns: { flexDirection: 'row', gap: 10, marginTop: 16 },
   toast: {

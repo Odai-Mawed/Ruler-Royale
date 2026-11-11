@@ -1,9 +1,6 @@
-import { Cinzel_700Bold } from '@expo-google-fonts/cinzel/700Bold';
-import { Cinzel_900Black } from '@expo-google-fonts/cinzel/900Black';
-import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, BackHandler, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { BackHandler, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FIGURE_MAP } from './src/data/figures';
 import { NavContext, type BattleRequest, type Nav, type Tab } from './src/nav';
@@ -15,7 +12,7 @@ import LexikonScreen from './src/screens/LexikonScreen';
 import PickerScreen from './src/screens/PickerScreen';
 import RankingScreen from './src/screens/RankingScreen';
 import TournamentScreen from './src/screens/TournamentScreen';
-import { C, F } from './src/theme';
+import { C } from './src/theme';
 
 type Overlay =
   | { type: 'detail'; id: string }
@@ -27,7 +24,7 @@ const TABS: { id: Tab; icon: string; label: string }[] = [
   { id: 'lexikon', icon: '📚', label: 'Lexikon' },
   { id: 'turnier', icon: '🏆', label: 'Turnier' },
   { id: 'rangliste', icon: '📊', label: 'Rangliste' },
-  { id: 'info', icon: '📖', label: 'Regeln' },
+  { id: 'info', icon: 'ℹ️', label: 'Regeln' },
 ];
 
 const readUrlBattle = (): BattleRequest | null => {
@@ -113,8 +110,7 @@ function Shell() {
             const active = t.id === tab && !top;
             return (
               <Pressable key={t.id} onPress={() => nav.setTab(t.id)} style={styles.tab} accessibilityRole="tab">
-                <Text style={[styles.tabIcon, !active && { opacity: 0.55 }]}>{t.icon}</Text>
-                <Text style={[styles.tabLabel, active && { color: C.gold }]}>{t.label}</Text>
+                <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{t.label}</Text>
               </Pressable>
             );
           })}
@@ -141,17 +137,9 @@ function Shell() {
 }
 
 export default function App() {
-  const [loaded] = useFonts({ Cinzel_700Bold, Cinzel_900Black });
-  if (!loaded) {
-    return (
-      <View style={[styles.root, { alignItems: 'center', justifyContent: 'center' }]}>
-        <ActivityIndicator color={C.gold} />
-      </View>
-    );
-  }
   return (
     <SafeAreaProvider>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
       <Shell />
     </SafeAreaProvider>
   );
@@ -165,9 +153,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: C.line,
     backgroundColor: C.bg2,
-    paddingTop: 8,
+    paddingTop: 4,
   },
   tab: { flex: 1, alignItems: 'center', gap: 2 },
-  tabIcon: { fontSize: 20 },
-  tabLabel: { color: C.muted, fontSize: 11, fontFamily: F.title },
+  tabIcon: { fontSize: 18 },
+  tabLabel: { color: C.muted, fontSize: 13, fontWeight: '500', paddingVertical: 6 },
+  tabLabelActive: { color: C.text, fontWeight: '700' },
 });

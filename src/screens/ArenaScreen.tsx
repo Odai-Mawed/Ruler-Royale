@@ -1,13 +1,12 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { eraOf, power } from '../data/arenas';
 import { FIGURES, FIGURE_MAP } from '../data/figures';
 import { randomSeed } from '../engine/rng';
 import { useNav } from '../nav';
 import { useProfile } from '../storage';
-import { C, F, SIDE, shadow } from '../theme';
-import { Avatar, Btn, Card, FadeIn, P, Pulse, Section } from '../ui';
+import { C, SIDE } from '../theme';
+import { Avatar, Btn, Card, H1, P, Section } from '../ui';
 import { Screen } from './common';
 
 export const DREAM_MATCHES: { a: string; b: string; tag: string }[] = [
@@ -32,29 +31,22 @@ export const DREAM_MATCHES: { a: string; b: string; tag: string }[] = [
 const Slot = ({ id, side, onPress }: { id?: string; side: 0 | 1; onPress: () => void }) => {
   const fig = id ? FIGURE_MAP[id] : undefined;
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.slot, { borderColor: SIDE[side] }, pressed && { opacity: 0.8 }]}>
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.slot, pressed && { opacity: 0.7 }]}>
+      <View style={[styles.sideDot, { backgroundColor: SIDE[side] }]} />
       {fig ? (
         <>
-          <Avatar fig={fig} size={84} ring={SIDE[side]} />
+          <Avatar fig={fig} size={64} />
           <Text style={styles.slotName} numberOfLines={2}>
             {fig.name}
           </Text>
           <Text style={styles.slotTitle} numberOfLines={1}>
             {fig.title}
           </Text>
-          <View style={styles.powerBadge}>
-            <Text style={styles.powerText}>⚡ {power(fig)}</Text>
-          </View>
         </>
       ) : (
-        <>
-          <View style={[styles.emptyAvatar, { borderColor: SIDE[side] }]}>
-            <Text style={{ fontSize: 34, color: SIDE[side] }}>?</Text>
-          </View>
-          <Text style={styles.slotName}>Kämpfer wählen</Text>
-        </>
+        <Text style={styles.slotName}>Kämpfer wählen</Text>
       )}
-      <Text style={[styles.slotHint, { color: SIDE[side] }]}>{fig ? 'Tippen zum Ändern' : 'Tippen'}</Text>
+      <Text style={styles.slotHint}>Ändern</Text>
     </Pressable>
   );
 };
@@ -86,83 +78,73 @@ export default function ArenaScreen() {
 
   return (
     <Screen>
-      <LinearGradient colors={['#2a1f0a', '#120f19']} style={[styles.hero, shadow]}>
-        <Text style={styles.crown}>👑</Text>
-        <Text style={styles.logo}>RULER ROYALE</Text>
-        <Text style={styles.tagline}>Die Arena der Weltgeschichte. Wer hätte gewonnen?</Text>
-        <Text style={styles.sub}>
-          {FIGURES.length} Herrscher, Feldherren & Genies · 5 Runden · 8 Arenen · Zufallsereignisse
-        </Text>
-      </LinearGradient>
+      <H1>Ruler Royale</H1>
+      <P>Wähle zwei Persönlichkeiten der Geschichte und finde heraus, wer gewonnen hätte.</P>
 
       <View style={styles.vsRow}>
         <Slot id={a} side={0} onPress={() => pick('a')} />
-        <View style={styles.vsCol}>
-          <Pulse>
-            <Text style={styles.vs}>VS</Text>
-          </Pulse>
-          <Pressable onPress={() => nav.setSelection({ a: b, b: a })} hitSlop={10} accessibilityLabel="Seiten tauschen">
-            <Text style={{ fontSize: 20, marginTop: 8 }}>🔄</Text>
-          </Pressable>
-        </View>
+        <Pressable
+          onPress={() => nav.setSelection({ a: b, b: a })}
+          hitSlop={10}
+          accessibilityLabel="Seiten tauschen"
+          style={styles.vsCol}
+        >
+          <Text style={styles.vs}>vs</Text>
+          <Text style={styles.swap}>⇄</Text>
+        </Pressable>
         <Slot id={b} side={1} onPress={() => pick('b')} />
       </View>
 
       {a && b && (
         <Text style={styles.gap}>
-          ⏳ {gapText(FIGURE_MAP[a].year, FIGURE_MAP[b].year)} · {eraOf(FIGURE_MAP[a].year)} vs. {eraOf(FIGURE_MAP[b].year)}
+          {gapText(FIGURE_MAP[a].year, FIGURE_MAP[b].year)} · {eraOf(FIGURE_MAP[a].year)} vs. {eraOf(FIGURE_MAP[b].year)}
         </Text>
       )}
 
       <View style={styles.actions}>
-        <Btn label="⚔️  ZUM KAMPF!" onPress={fight} disabled={!a || !b} style={{ flex: 2 }} />
-        <Btn label="🎲 Zufall" onPress={random} variant="ghost" style={{ flex: 1 }} />
+        <Btn label="Kampf starten" onPress={fight} disabled={!a || !b} style={{ flex: 2 }} />
+        <Btn label="Zufall" onPress={random} variant="ghost" style={{ flex: 1 }} />
       </View>
 
-      <Section title="🔥 Traumduelle">
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 16 }}>
+      <Section title="Traumduelle">
+        <Card style={{ padding: 0 }}>
           {DREAM_MATCHES.map((m, i) => {
             const fa = FIGURE_MAP[m.a];
             const fb = FIGURE_MAP[m.b];
             return (
-              <FadeIn key={m.a + m.b} delay={i * 40}>
-                <Pressable
-                  onPress={() => {
-                    nav.setSelection({ a: m.a, b: m.b });
-                    nav.openBattle({ a: m.a, b: m.b, seed: randomSeed(), predict: true, record: true });
-                  }}
-                  style={({ pressed }) => [styles.dream, pressed && { opacity: 0.8 }]}
-                >
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Avatar fig={fa} size={46} ring={C.red} />
-                    <Text style={styles.dreamVs}>vs</Text>
-                    <Avatar fig={fb} size={46} ring={C.blue} />
-                  </View>
-                  <Text style={styles.dreamTag}>{m.tag}</Text>
-                  <Text style={styles.dreamNames} numberOfLines={2}>
+              <Pressable
+                key={m.a + m.b}
+                onPress={() => {
+                  nav.setSelection({ a: m.a, b: m.b });
+                  nav.openBattle({ a: m.a, b: m.b, seed: randomSeed(), predict: true, record: true });
+                }}
+                style={({ pressed }) => [styles.row, i > 0 && styles.rowBorder, pressed && { backgroundColor: C.surface2 }]}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.rowTitle} numberOfLines={1}>
                     {fa.name} vs. {fb.name}
                   </Text>
-                </Pressable>
-              </FadeIn>
+                  <Text style={styles.rowSub}>{m.tag}</Text>
+                </View>
+                <Text style={styles.chev}>›</Text>
+              </Pressable>
             );
           })}
-        </ScrollView>
+        </Card>
       </Section>
 
-      <Section title="🎯 Deine Bilanz">
+      <Section title="Deine Bilanz">
         <View style={styles.statsRow}>
           <Stat label="Kämpfe" value={String(profile.battles)} />
-          <Stat label="Trefferquote" value={profile.predTotal ? `${quote}%` : '–'} />
-          <Stat label="Serie" value={`🔥 ${profile.streak}`} />
-          <Stat label="Rekord" value={`🏅 ${profile.bestStreak}`} />
+          <Stat label="Treffer" value={profile.predTotal ? `${quote}%` : '–'} />
+          <Stat label="Serie" value={String(profile.streak)} />
+          <Stat label="Rekord" value={String(profile.bestStreak)} />
         </View>
-        <P style={{ marginTop: 8, fontSize: 13 }}>
-          Tippe vor jedem Kampf auf den Sieger und baue deine Siegesserie aus.
-        </P>
+        <P style={{ marginTop: 8, fontSize: 13 }}>Tippe vor jedem Kampf auf den Sieger, um deine Serie auszubauen.</P>
       </Section>
 
       {profile.history.length > 0 && (
-        <Section title="📜 Letzte Kämpfe">
+        <Section title="Letzte Kämpfe">
           <Card style={{ padding: 0 }}>
             {profile.history.slice(0, 8).map((h, i) => {
               const fa = FIGURE_MAP[h.a];
@@ -172,16 +154,14 @@ export default function ArenaScreen() {
                 <Pressable
                   key={h.t + h.seed}
                   onPress={() => nav.openBattle({ a: h.a, b: h.b, seed: h.seed, predict: false, record: false, label: 'Wiederholung' })}
-                  style={[styles.histRow, i > 0 && { borderTopWidth: 1, borderTopColor: C.line }]}
+                  style={[styles.row, i > 0 && styles.rowBorder]}
                 >
                   <Text style={[styles.histName, h.w === h.a && styles.histWin]} numberOfLines={1}>
-                    {h.w === h.a ? '👑 ' : ''}
                     {fa.name}
                   </Text>
                   <Text style={{ color: C.dim, marginHorizontal: 8 }}>vs</Text>
                   <Text style={[styles.histName, { textAlign: 'right' }, h.w === h.b && styles.histWin]} numberOfLines={1}>
                     {fb.name}
-                    {h.w === h.b ? ' 👑' : ''}
                   </Text>
                 </Pressable>
               );
@@ -194,74 +174,48 @@ export default function ArenaScreen() {
 }
 
 const Stat = ({ label, value }: { label: string; value: string }) => (
-  <Card style={{ flex: 1, alignItems: 'center', paddingVertical: 12, paddingHorizontal: 6 }}>
-    <Text style={{ color: C.gold, fontFamily: F.title, fontSize: 18 }}>{value}</Text>
-    <Text style={{ color: C.muted, fontSize: 11, marginTop: 2 }}>{label}</Text>
-  </Card>
+  <View style={styles.stat}>
+    <Text style={{ color: C.text, fontWeight: '700', fontSize: 20 }}>{value}</Text>
+    <Text style={{ color: C.muted, fontSize: 12, marginTop: 2 }}>{label}</Text>
+  </View>
 );
 
 export const gapText = (y1: number, y2: number) => {
   const d = Math.abs(y1 - y2);
-  if (d < 15) return 'Zeitgenossen!';
-  return `${d.toLocaleString('de-DE')} Jahre Zeitreise`;
+  if (d < 15) return 'Zeitgenossen';
+  return `${d.toLocaleString('de-DE')} Jahre auseinander`;
 };
 
 const styles = StyleSheet.create({
-  hero: {
-    borderRadius: 22,
-    padding: 22,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#4a3a16',
-  },
-  crown: { fontSize: 40 },
-  logo: { fontFamily: F.display, color: C.gold, fontSize: 34, letterSpacing: 3, textAlign: 'center' },
-  tagline: { color: C.text, fontSize: 16, marginTop: 6, textAlign: 'center' },
-  sub: { color: C.muted, fontSize: 12, marginTop: 6, textAlign: 'center' },
-  vsRow: { flexDirection: 'row', alignItems: 'center', marginTop: 20 },
-  vsCol: { width: 60, alignItems: 'center' },
-  vs: { fontFamily: F.display, fontSize: 30, color: C.gold },
+  vsRow: { flexDirection: 'row', alignItems: 'stretch', marginTop: 24 },
+  vsCol: { width: 48, alignItems: 'center', justifyContent: 'center' },
+  vs: { fontWeight: '600', fontSize: 16, color: C.muted },
+  swap: { fontSize: 18, color: C.muted, marginTop: 6 },
   slot: {
     flex: 1,
     alignItems: 'center',
     backgroundColor: C.surface,
-    borderRadius: 20,
-    borderWidth: 2,
-    paddingVertical: 18,
-    paddingHorizontal: 8,
-    minHeight: 210,
-    justifyContent: 'center',
-  },
-  emptyAvatar: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    borderWidth: 2,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  slotName: { color: C.text, fontFamily: F.title, fontSize: 15, textAlign: 'center', marginTop: 10 },
-  slotTitle: { color: C.muted, fontSize: 12, textAlign: 'center', marginTop: 2 },
-  slotHint: { fontSize: 11, marginTop: 8, opacity: 0.8 },
-  powerBadge: { marginTop: 8, backgroundColor: C.surface2, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 3 },
-  powerText: { color: C.gold, fontSize: 12, fontWeight: '700' },
-  gap: { color: C.muted, textAlign: 'center', marginTop: 12, fontSize: 13 },
-  actions: { flexDirection: 'row', gap: 10, marginTop: 14 },
-  dream: {
-    width: 170,
-    backgroundColor: C.surface,
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: C.line,
-    padding: 12,
-    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 8,
+    minHeight: 180,
+    justifyContent: 'center',
   },
-  dreamVs: { color: C.gold, fontFamily: F.display, marginHorizontal: 6 },
-  dreamTag: { color: C.gold, fontSize: 12, fontWeight: '700', marginTop: 8, textAlign: 'center' },
-  dreamNames: { color: C.text, fontSize: 13, marginTop: 2, textAlign: 'center' },
+  sideDot: { position: 'absolute', top: 10, left: 10, width: 8, height: 8, borderRadius: 4 },
+  slotName: { color: C.text, fontWeight: '600', fontSize: 15, textAlign: 'center', marginTop: 10 },
+  slotTitle: { color: C.muted, fontSize: 12, textAlign: 'center', marginTop: 2 },
+  slotHint: { fontSize: 12, marginTop: 8, color: C.dim },
+  gap: { color: C.muted, textAlign: 'center', marginTop: 12, fontSize: 13 },
+  actions: { flexDirection: 'row', gap: 10, marginTop: 16 },
+  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 14 },
+  rowBorder: { borderTopWidth: 1, borderTopColor: C.line },
+  rowTitle: { color: C.text, fontSize: 14, fontWeight: '500' },
+  rowSub: { color: C.muted, fontSize: 12, marginTop: 2 },
+  chev: { color: C.dim, fontSize: 20, marginLeft: 8 },
   statsRow: { flexDirection: 'row', gap: 8 },
-  histRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 14 },
+  stat: { flex: 1, alignItems: 'center', paddingVertical: 12, backgroundColor: C.surface2, borderRadius: 10 },
   histName: { flex: 1, color: C.muted, fontSize: 14 },
-  histWin: { color: C.gold, fontWeight: '700' },
+  histWin: { color: C.text, fontWeight: '700' },
 });

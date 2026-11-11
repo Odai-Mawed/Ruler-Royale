@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FIGURES, FIGURE_MAP } from '../data/figures';
@@ -13,8 +12,8 @@ import {
 import { randomSeed, shuffle } from '../engine/rng';
 import { useNav } from '../nav';
 import { recordChampion, useProfile } from '../storage';
-import { C, F, SIDE, shadow } from '../theme';
-import { Avatar, Btn, Card, Chip, FadeIn, H1, P, Pulse, Section } from '../ui';
+import { C, SIDE } from '../theme';
+import { Avatar, Btn, Card, Chip, FadeIn, H1, P, Section } from '../ui';
 import { Screen } from './common';
 
 // Turnier bleibt beim Tab-Wechsel erhalten
@@ -38,7 +37,7 @@ export default function TournamentScreen() {
 
   const start = () => {
     const ids = shuffle(Math.random, pool.map((f) => f.id)).slice(0, effSize);
-    setT(createTournament(`${theme.emoji} ${theme.name}`, ids, randomSeed()));
+    setT(createTournament(theme.name, ids, randomSeed()));
   };
 
   const next = () => {
@@ -78,7 +77,7 @@ export default function TournamentScreen() {
         <Section title="Thema">
           <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
             {TOURNAMENT_THEMES.map((th) => (
-              <Chip key={th.id} label={`${th.emoji} ${th.name}`} active={th.id === themeId} onPress={() => setThemeId(th.id)} />
+              <Chip key={th.id} label={th.name} active={th.id === themeId} onPress={() => setThemeId(th.id)} />
             ))}
           </View>
           <P style={{ fontSize: 13 }}>{pool.length} mögliche Teilnehmer</P>
@@ -90,15 +89,15 @@ export default function TournamentScreen() {
             ))}
           </View>
         </Section>
-        <Btn label="🏆 Turnier starten" onPress={start} style={{ marginTop: 20 }} />
+        <Btn label="Turnier starten" onPress={start} style={{ marginTop: 20 }} />
         {champs.length > 0 && (
-          <Section title="👑 Deine Turniersieger">
+          <Section title="Deine Turniersieger">
             <Card>
               {champs.map(([id, n]) => (
                 <View key={id} style={styles.champRow}>
                   <Avatar fig={FIGURE_MAP[id]} size={34} />
                   <Text style={{ color: C.text, flex: 1, marginLeft: 10 }}>{FIGURE_MAP[id].name}</Text>
-                  <Text style={{ color: C.gold, fontWeight: '700' }}>{n}× 🏆</Text>
+                  <Text style={{ color: C.muted }}>{n}×</Text>
                 </View>
               ))}
             </Card>
@@ -113,19 +112,17 @@ export default function TournamentScreen() {
       <H1 style={{ fontSize: 24 }}>{t.name}</H1>
       {t.champion ? (
         <FadeIn>
-          <LinearGradient colors={['#3a2a08', '#17131f']} style={[styles.champ, shadow]}>
-            <Pulse>
-              <Text style={{ fontSize: 44 }}>🏆</Text>
-            </Pulse>
-            <Avatar fig={FIGURE_MAP[t.champion]} size={100} ring={C.gold} />
+          <View style={styles.champ}>
+            <Text style={{ color: C.muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Champion</Text>
+            <Avatar fig={FIGURE_MAP[t.champion]} size={80} />
             <Text style={styles.champName}>{FIGURE_MAP[t.champion].name}</Text>
-            <Text style={{ color: C.text, marginTop: 4 }}>ist Champion der Geschichte! 🎉</Text>
-          </LinearGradient>
+            <Text style={{ color: C.text, marginTop: 4 }}>gewinnt das Turnier</Text>
+          </View>
         </FadeIn>
       ) : (
         <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
-          <Btn label={`▶ ${ROUND_NAMES[t.rounds[t.rounds.length - 1].length * 2] ?? 'Runde'} ausspielen`} onPress={next} style={{ flex: 2 }} />
-          <Btn label="⏩ Alles" onPress={all} variant="ghost" style={{ flex: 1 }} />
+          <Btn label={`${ROUND_NAMES[t.rounds[t.rounds.length - 1].length * 2] ?? 'Runde'} ausspielen`} onPress={next} style={{ flex: 2 }} />
+          <Btn label="Alles simulieren" onPress={all} variant="ghost" style={{ flex: 1 }} />
         </View>
       )}
       <P style={{ fontSize: 12, marginTop: 10 }}>Tippe auf einen Kampf, um ihn live (oder als Wiederholung) anzusehen.</P>
@@ -153,22 +150,22 @@ const MatchCard = ({ m, onPress }: { m: Match; onPress: () => void }) => (
       const lost = m.winner && !won;
       return (
         <View key={id} style={[styles.matchRow, lost && { opacity: 0.4 }]}>
-          <Avatar fig={f} size={30} ring={won ? C.gold : SIDE[k]} />
-          <Text style={[styles.matchName, won && { color: C.gold, fontWeight: '700' }]} numberOfLines={1}>
+          <Avatar fig={f} size={30} ring={SIDE[k]} />
+          <Text style={[styles.matchName, won && { fontWeight: '700' }]} numberOfLines={1}>
             {f.name}
           </Text>
-          {won && <Text>👑</Text>}
+          {won && <Text style={{ color: C.green }}>✓</Text>}
         </View>
       );
     })}
-    <Text style={styles.matchVerdict}>{m.verdict ?? '⚔️ ansehen'}</Text>
+    <Text style={styles.matchVerdict}>{m.verdict ?? 'Ansehen ›'}</Text>
   </Pressable>
 );
 
 const styles = StyleSheet.create({
   champRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 6 },
-  champ: { borderRadius: 22, padding: 20, alignItems: 'center', marginTop: 14, borderWidth: 1, borderColor: C.goldDeep },
-  champName: { fontFamily: F.display, color: C.gold, fontSize: 24, marginTop: 10, textAlign: 'center' },
+  champ: { borderRadius: 12, padding: 20, alignItems: 'center', marginTop: 14, borderWidth: 1, borderColor: C.line },
+  champName: { fontWeight: '700', color: C.text, fontSize: 22, marginTop: 10, textAlign: 'center' },
   matches: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   match: {
     flexGrow: 1,

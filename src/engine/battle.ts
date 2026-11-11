@@ -153,7 +153,7 @@ export const simulateBattle = (a: Figure, b: Figure, seed: string): BattleResult
     const shared = { seucheVictim: rng() < 0.5 ? 0 : 1 };
     const lines: string[] = [];
     const picker = picks[i];
-    if (picker !== undefined) lines.push(`🎯 ${fighters[picker].name} wählt das Terrain: ${arena.name}.`);
+    if (picker !== undefined) lines.push(`${fighters[picker].name} wählt das Terrain: ${arena.name}.`);
 
     const sides = fighters.map((self, k) => {
       const opp = fighters[1 - k];
@@ -200,12 +200,12 @@ export const simulateBattle = (a: Figure, b: Figure, seed: string): BattleResult
     }) as [SideRound, SideRound];
 
     // Erzählung: Ereignis & Fähigkeiten
-    if (event) lines.push(`${EVENTS[event].emoji} ${EVENTS[event].name}! ${EVENTS[event].text}`);
+    if (event) lines.push(`Ereignis: ${EVENTS[event].name}. ${EVENTS[event].text}`);
     sides.forEach((sd, k) => {
       sd.mods.forEach((m) => {
-        if (m.kind === 'ability') lines.push(`⚡ ${fighters[k].name} aktiviert „${m.label}“ (+${m.value})`);
-        if (m.kind === 'swap') lines.push(`✨ ${fighters[k].name}: „${m.label}“ – kämpft auf eigene Art!`);
-        if (m.kind === 'weakness') lines.push(`💔 Achillesferse von ${fighters[k].name}: „${m.label}“ (${m.value})`);
+        if (m.kind === 'ability') lines.push(`${fighters[k].name} aktiviert „${m.label}“ (+${m.value})`);
+        if (m.kind === 'swap') lines.push(`${fighters[k].name}: „${m.label}“ – kämpft auf eigene Art!`);
+        if (m.kind === 'weakness') lines.push(`Schwäche von ${fighters[k].name}: „${m.label}“ (${m.value})`);
       });
     });
 
@@ -218,7 +218,7 @@ export const simulateBattle = (a: Figure, b: Figure, seed: string): BattleResult
       damage = Math.round(6 * mult);
       hp[0] = Math.max(0, hp[0] - damage);
       hp[1] = Math.max(0, hp[1] - damage);
-      lines.push(`🤜🤛 Patt! Beide schenken sich nichts – jeder verliert ${damage} Machtpunkte.`);
+      lines.push(`Patt! Beide schenken sich nichts – jeder verliert ${damage} Machtpunkte.`);
     } else {
       winner = diff > 0 ? 0 : 1;
       const abs = Math.abs(diff);

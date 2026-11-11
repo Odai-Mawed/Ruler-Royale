@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-na
 import { eraOf, power } from '../data/arenas';
 import { FIGURES } from '../data/figures';
 import { useNav } from '../nav';
-import { C, F, MAX_W } from '../theme';
+import { C, MAX_W } from '../theme';
 import type { Category } from '../types';
 import { Avatar, Chip, FadeIn, H1, P } from '../ui';
 import { Screen } from './common';
@@ -48,9 +48,9 @@ export default function LexikonScreen() {
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4, marginBottom: 12 }}>
         <Text style={{ color: C.muted, marginRight: 8, fontSize: 13 }}>Sortieren:</Text>
-        <Chip label="⏳ Zeit" active={sort === 'chrono'} onPress={() => setSort('chrono')} />
-        <Chip label="⚡ Stärke" active={sort === 'power'} onPress={() => setSort('power')} />
-        <Chip label="🔤 A–Z" active={sort === 'name'} onPress={() => setSort('name')} />
+        <Chip label="Zeit" active={sort === 'chrono'} onPress={() => setSort('chrono')} />
+        <Chip label="Stärke" active={sort === 'power'} onPress={() => setSort('power')} />
+        <Chip label="A–Z" active={sort === 'name'} onPress={() => setSort('name')} />
       </View>
 
       <View style={styles.grid}>
@@ -93,9 +93,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 200,
   },
-  name: { color: C.text, fontFamily: F.title, fontSize: 14, textAlign: 'center', marginTop: 10 },
+  name: { color: C.text, fontWeight: '600', fontSize: 14, textAlign: 'center', marginTop: 10 },
   title: { color: C.muted, fontSize: 12, textAlign: 'center', marginTop: 2 },
   era: { color: C.dim, fontSize: 11, textAlign: 'center', marginTop: 4 },
   power: { marginTop: 8, backgroundColor: C.surface2, borderRadius: 99, paddingHorizontal: 10, paddingVertical: 3 },
-  powerText: { color: C.gold, fontSize: 12, fontWeight: '700' },
+  powerText: { color: C.muted, fontSize: 12, fontWeight: '500' },
 });
