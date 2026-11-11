@@ -1,0 +1,43 @@
+{
+  "expo": {
+    "name": "Ruler Royale",
+    "slug": "ruler-royale",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0b0a10",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0b0a10"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.rulerroyale.app"
+    },
+    "android": {
+      "package": "com.rulerroyale.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0b0a10",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single",
+      "name": "Ruler Royale – Die Arena der Weltgeschichte",
+      "shortName": "Ruler Royale",
+      "themeColor": "#0b0a10",
+      "backgroundColor": "#0b0a10",
+      "description": "Wer hätte gewonnen? Napoleon vs. Omar, Churchill vs. Trump – lass die Großen der Geschichte gegeneinander antreten."
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
